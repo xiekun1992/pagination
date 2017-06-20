@@ -12,6 +12,10 @@
 - pagination.select: 点击分页按钮之后触发
 - pagination.destroy: 分页插件被销毁之后触发
 
+#### API:
+- init(): 初始化分页插件
+- select(page): 跳转到特定页码
+
 ``` javascript
 var pagination = document.querySelector("#pagination");
 var p = new _x.Pagination({
