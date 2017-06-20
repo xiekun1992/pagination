@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Pagination</title>
+	<link rel="stylesheet" href="../src/pagination.css">
+</head>
+<body>
+	<div id="pagination"></div>
+	<script src="../src/pagination.js"></script>
+	<script>
+		var p = new _x.Pagination({
+			container: pagination,
+			pageSize: 1,
+			pageTotal: 10,
+			btnNum: 5
+		});
+		p.on('pagination.init', function(){
+			console.log(1);
+		});
+		p.on('pagination.select', function(page){
+			console.log(page);
+		});
+		p.init();
+	</script>
+</body>
+</html>
