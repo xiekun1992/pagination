@@ -4,24 +4,53 @@
 	<meta charset="UTF-8">
 	<title>Pagination</title>
 	<link rel="stylesheet" href="../src/pagination.css">
+	<style>
+		div{
+			margin: 5px 0;
+		}
+		#pagination2 .x-pagination>li>a{
+			padding: 10px 20px;
+			font-size: 16px;
+		}
+		#pagination2 .x-pagination>li{
+			margin: 0 5px;
+		}
+		#pagination2 .x-pagination{
+			margin: 0 -5px;
+		}
+		#pagination2 .x-pagination>li:hover,
+		#pagination2 .x-pagination>li.active{
+			background-color: #ff5722;
+		}
+	</style>
 </head>
 <body>
-	<div id="pagination"></div>
+	<div id="pagination1"></div>
+	<div id="pagination3"></div>
+	<div id="pagination2"></div>
 	<script src="../src/pagination.js"></script>
 	<script>
-		var p = new _x.Pagination({
-			container: pagination,
+		var p1 = new _x.Pagination({
+			container: pagination1,
 			pageSize: 1,
 			pageTotal: 10,
 			btnNum: 5
-		});
-		p.on('pagination.init', function(){
-			console.log(1);
-		});
-		p.on('pagination.select', function(page){
-			console.log(page);
-		});
-		p.init();
+		}).init();
+		p1.select(2);
+		var p2 = new _x.Pagination({
+			container: pagination2,
+			pageSize: 1,
+			pageTotal: 10,
+			btnNum: 5
+		}).init();
+		p2.select(10);
+		var p3 = new _x.Pagination({
+			container: pagination3,
+			pageSize: 1,
+			pageTotal: 10,
+			btnNum: 5
+		}).init();
+		p3.select(5);
 	</script>
 </body>
 </html>

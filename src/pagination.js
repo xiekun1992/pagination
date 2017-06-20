@@ -132,6 +132,7 @@
 			this.container.appendChild(frag);
 		}
 		this.trigger("pagination.init");
+		return this;
 	};
 	Pagination.prototype.select = function(pageNum){
 		// 计算当前页
@@ -153,6 +154,7 @@
 		}
 		this.updateButtonRange();
 		this.trigger("pagination.select", this.pageNum);
+		return this;
 	};
 	Pagination.prototype.updateButton = function(delta){
 		this.btnStartNum += delta;
