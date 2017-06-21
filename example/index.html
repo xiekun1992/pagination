@@ -28,26 +28,28 @@
 	<div id="pagination1"></div>
 	<div id="pagination3"></div>
 	<div id="pagination2"></div>
+	<button>销毁</button>
+	<button>创建</button>
 	<script src="../src/pagination.js"></script>
 	<script>
 		var p1 = new _x.Pagination({
 			container: pagination1,
 			pageSize: 1,
-			pageTotal: 10,
+			totalNum: 10,
 			btnNum: 5
 		}).init();
 		p1.select(2);
 		var p2 = new _x.Pagination({
 			container: pagination2,
-			pageSize: 1,
-			pageTotal: 10,
-			btnNum: 5
+			pageSize: 2,
+			totalNum: 100,
+			btnNum: 10
 		}).init();
 		p2.select(10);
 		var p3 = new _x.Pagination({
 			container: pagination3,
-			pageSize: 1,
-			pageTotal: 10,
+			pageSize: 10,
+			totalNum: 10,
 			btnNum: 5
 		}).init();
 		p3.select(5);

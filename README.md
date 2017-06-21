@@ -15,6 +15,7 @@
 #### API:
 - init(): 初始化分页插件
 - select(page): 跳转到特定页码
+- destroy(): 销毁分页插件，然后将分页插件的引用置为null即可释放内存
 
 ``` javascript
 var pagination = document.querySelector("#pagination");
