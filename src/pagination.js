@@ -20,7 +20,7 @@
 		this.domElement.appendChild(this.aElement);
 
 		this.aElement.innerText = this.text;
-		this.aElement.setAttribute('href', 'javascript:void(0)');
+		// this.aElement.setAttribute('href', 'javascript:void(0)');
 		this.aElement.addEventListener('click', function(){
 			this.trigger('button.clicked', this.value);
 		}.bind(this));
@@ -37,7 +37,11 @@
 	};
 	Button.prototype.updateStyle = function(value){
 		// 当前按钮未被点击则取消选中样式
-		if(value !== this.value){
+		if(value == 'disable'){
+			this.domElement.setAttribute('class', 'disabled');
+		}else if(value == 'enable'){
+			this.domElement.removeAttribute('class');
+		}else if(value !== this.value){
 			var attr = this.domElement.getAttribute('class');
 			if(attr){
 				attr = attr.replace(/^active$|^active|active$|\s+?active\s+?/g, ' ')
@@ -91,12 +95,15 @@
 
 
 	function Pagination(options){
-		this.domElement = null;
 		this.pageSize = options.pageSize || 0;
 		this.totalNum = options.totalNum || 0;
-		this.btnStartNum = this.pageNum = 1;
-		this.btnEndNum = this.btnNum = options.btnNum || 5;
 		this.container = options.container;
+		this.btnNum = this.btnEndNum = options.btnNum || 5;
+		this.preText = options.preText || 'pre';
+		this.nextText = options.nextText || 'next';
+		
+		this.btnStartNum = this.pageNum = 1;
+		this.domElement = null;
 		this.totalPage = Math.ceil(this.totalNum / this.pageSize);
 		this.btns = [];
 	}
@@ -114,7 +121,7 @@
 			this.domElement = document.createElement('ul');
 			this.domElement.setAttribute('class', 'x-pagination');
 			// 上一页按钮
-			var preBtn = new Button({text: 'pre', value: 'pre'}).init();
+			var preBtn = new Button({text: this.preText, value: 'pre'}).init();
 			this.btns.push(preBtn);
 			this.domElement.appendChild(preBtn.domElement);
 			preBtn.on('button.clicked', this.select.bind(this));
@@ -129,7 +136,7 @@
 				this.btns.push(btn);
 			}
 			// 下一页按钮
-			var nextBtn = new Button({text: 'next', value: 'next'}).init();
+			var nextBtn = new Button({text: this.nextText, value: 'next'}).init();
 			this.btns.push(nextBtn);
 			this.domElement.appendChild(nextBtn.domElement);
 			nextBtn.on('button.clicked', this.select.bind(this));
@@ -141,6 +148,7 @@
 		return this;
 	};
 	Pagination.prototype.select = function(pageNum){
+		var preBtn = this.btns[0], nextBtn = this.btns[this.btns.length - 1];
 		// 计算当前页
 		if(pageNum === 'pre'){
 			this.pageNum--;
@@ -160,6 +168,22 @@
 			}else{
 				this.pageNum = pageNum;
 			}
+		}
+		if(this.pageNum == this.totalPage){
+			if(this.pageNum == 1){
+				preBtn.trigger('button.updatestyle', 'disable');
+				nextBtn.trigger('button.updatestyle', 'disable');
+			}else{
+				preBtn.trigger('button.updatestyle', 'enable');
+				nextBtn.trigger('button.updatestyle', 'disable');	
+			}
+		}else if(this.pageNum == 1){
+			nextBtn.trigger('button.updatestyle', 'enable');
+			preBtn.trigger('button.updatestyle', 'disable');
+		}else{
+			preBtn.trigger('button.updatestyle', 'enable');
+			nextBtn.trigger('button.updatestyle', 'enable');
+			
 		}
 		for(var i = 0; i < this.btns.length; i++){
 			this.btns[i].trigger('button.updatestyle', this.pageNum);

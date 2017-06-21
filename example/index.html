@@ -6,13 +6,16 @@
 	<link rel="stylesheet" href="../src/pagination.css">
 	<style>
 		div{
-			margin: 5px 0;
+			margin: 15px 0;
 		}
 		#pagination2 .x-pagination>li>a{
-			padding: 10px 20px;
-			font-size: 16px;
+	        padding: 7px 0;
+   	 		width: 30px;
+		    text-align: center;
+		    border-radius: 50%;
 		}
 		#pagination2 .x-pagination>li{
+		    border-radius: 50%;
 			margin: 0 5px;
 		}
 		#pagination2 .x-pagination{
@@ -25,11 +28,10 @@
 	</style>
 </head>
 <body>
-	<div id="pagination1"></div>
 	<div id="pagination3"></div>
+	<div id="pagination1"></div>
 	<div id="pagination2"></div>
-	<button>销毁</button>
-	<button>创建</button>
+
 	<script src="../src/pagination.js"></script>
 	<script>
 		var p1 = new _x.Pagination({
@@ -43,14 +45,18 @@
 			container: pagination2,
 			pageSize: 2,
 			totalNum: 100,
-			btnNum: 10
+			btnNum: 10,
+			preText: '<<',
+			nextText: '>>'
 		}).init();
 		p2.select(10);
 		var p3 = new _x.Pagination({
 			container: pagination3,
 			pageSize: 10,
 			totalNum: 10,
-			btnNum: 5
+			btnNum: 5,
+			preText: '上一页',
+			nextText: '下一页'
 		}).init();
 		p3.select(5);
 	</script>

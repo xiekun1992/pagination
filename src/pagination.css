@@ -16,14 +16,24 @@
     margin: 0 1px;
     background-color: #dddddd;
     border-radius: 2px;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -o-user-select: none;
 }
 .x-pagination>li>a {
     padding: 5px 10px;
     display: inline-block;
 	text-decoration: none;
 	color: #fff;
+	cursor: pointer;
 }
 .x-pagination>li:hover,
 .x-pagination>li.active{
 	background-color: #3da1ff;
+}
+.x-pagination>li.disabled>a{
+	background-color: #dddddd;
+	cursor: not-allowed;
 }
