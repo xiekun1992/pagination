@@ -4,6 +4,32 @@
 	}
 	this._x.Pagination = factory();
 })(function (){
+	function Event(){
+		this.events = {};
+	}
+	Event.prototype.on = function(name, cb){
+		if(!this.events[name]){
+			this.events[name] = [];
+		}
+		this.events[name].push(cb);
+	};
+	Event.prototype.trigger = function(name, params){
+		if(this.events[name]){
+			for(var i = 0; i < this.events[name].length; i++){
+				this.events[name][i](params);
+			}
+		}
+	};
+	Event.prototype.unbind = function(name, cb){
+		if(this.events[name] && this.events[name].length > 0){
+			for(var i = this.events[name].length - 1; i > -1; i--){
+				if(this.events[name][i] === cb){
+					this.events[name].splice(i, 1);
+				}
+			}
+		}
+	};
+
 	function Button(options){
 		Event.call(this);
 		this.domElement = null;
@@ -61,60 +87,68 @@
 	};
 	Button.prototype.destroy = function(){
 		this.domElement.removeChild(this.aElement);
+		this.domElement.parentNode.removeChild(this.domElement);
 		this.trigger('button.destroy');
+		this.domElement = null;
 		this.value = null;
 		this.text = null;
 		this.events = null;
 	};
 
-	function Event(){
-		this.events = {};
-	}
-	Event.prototype.on = function(name, cb){
-		if(!this.events[name]){
-			this.events[name] = [];
-		}
-		this.events[name].push(cb);
-	};
-	Event.prototype.trigger = function(name, params){
-		if(this.events[name]){
-			for(var i = 0; i < this.events[name].length; i++){
-				this.events[name][i](params);
-			}
-		}
-	};
-	Event.prototype.unbind = function(name, cb){
-		if(this.events[name] && this.events[name].length > 0){
-			for(var i = this.events[name].length - 1; i > -1; i--){
-				if(this.events[name][i] === cb){
-					this.events[name].splice(i, 1);
-				}
-			}
-		}
-	};
-
-
 	function Pagination(options){
+		Event.call(this);
 		this.pageSize = options.pageSize || 0;
 		this.totalNum = options.totalNum || 0;
 		this.container = options.container;
-		this.btnNum = this.btnEndNum = options.btnNum || 5;
+		this.btnNum = this.btnEndNum = options.btnNum || 5; // 分页按钮数
 		this.preText = options.preText || 'pre';
 		this.nextText = options.nextText || 'next';
 		
 		this.btnStartNum = this.pageNum = 1;
 		this.domElement = null;
+		this.numberBtns = [];
+		this.commandBtns = [];
+		this.btns = [].concat(this.numberBtns, this.commandBtns);
 		this.totalPage = Math.ceil(this.totalNum / this.pageSize);
-		this.btns = [];
 	}
-	Pagination.prototype = Object.create(new Event());
-
+	Pagination.prototype = Object.create(Event.prototype);
+	// 总记录数或者每页记录数发生变化时更新分页显示
+	Pagination.prototype.refresh = function(){
+		var oldTotalPage = this.totalPage;
+		var btnNum, i;
+		this.totalPage = Math.ceil(this.totalNum / this.pageSize);
+		if(this.totalPage === oldTotalPage){
+			// 总页数未发生变化
+			return ;
+		}else if(this.totalPage > oldTotalPage){
+			// 总页数增加
+			if(this.totalPage > this.numberBtns.length){
+				// 增加后的总页数大于当前分页按钮数则增加按钮
+				btnNum = this.totalPage;
+				for(i = this.numberBtns.length + 1; i <= btnNum; i++){
+					var btn = new Button({value: i, text: i}).init();
+					btn.on('button.clicked', this.select.bind(this));
+					// 插入到dom
+					this.domElement.insertBefore(btn.domElement, this.commandBtns[1].domElement);
+					this.numberBtns.push(btn);
+				}
+			}
+		}else{
+			// 总页数减少
+			if(this.totalPage < this.numberBtns.length){
+				// 增加后的总页数小于当前分页按钮数则减少按钮
+				btnNum = this.totalPage;
+				for(i = this.numberBtns.length; i > btnNum; i--){
+					this.numberBtns[i - 1].destroy();
+					this.numberBtns.splice(i - 1, 1);
+				}	
+			}
+		}
+	};
 	Pagination.prototype.init = function(){
 		if(this.totalPage > 0){
-			var btnNum;
-			if(this.totalPage > this.btnNum){
-				btnNum = this.btnNum;
-			}else{
+			var btnNum = this.btnNum;
+			if(this.totalPage < this.btnNum){
 				btnNum = this.totalPage;
 			}
 			var frag = document.createDocumentFragment();
@@ -122,7 +156,7 @@
 			this.domElement.setAttribute('class', 'x-pagination');
 			// 上一页按钮
 			var preBtn = new Button({text: this.preText, value: 'pre'}).init();
-			this.btns.push(preBtn);
+			this.commandBtns.push(preBtn);
 			this.domElement.appendChild(preBtn.domElement);
 			preBtn.on('button.clicked', this.select.bind(this));
 
@@ -133,22 +167,22 @@
 				if(i === 1){
 					btn.domElement.setAttribute('class', 'active');
 				}
-				this.btns.push(btn);
+				this.numberBtns.push(btn);
 			}
 			// 下一页按钮
 			var nextBtn = new Button({text: this.nextText, value: 'next'}).init();
-			this.btns.push(nextBtn);
+			this.commandBtns.push(nextBtn);
 			this.domElement.appendChild(nextBtn.domElement);
 			nextBtn.on('button.clicked', this.select.bind(this));
 			
 			frag.appendChild(this.domElement);
 			this.container.appendChild(frag);
 		}
-		this.trigger("pagination.init");
+		this.trigger("pagination.init", {pageNum: this.pageNum, totalPage: this.totalPage});
 		return this;
 	};
 	Pagination.prototype.select = function(pageNum){
-		var preBtn = this.btns[0], nextBtn = this.btns[this.btns.length - 1];
+		var preBtn = this.commandBtns[0], nextBtn = this.commandBtns[1];
 		// 计算当前页
 		if(pageNum === 'pre'){
 			this.pageNum--;
@@ -216,8 +250,8 @@
 	Pagination.prototype.destroy = function(){
 		for(var i = 0; i < this.btns.length; i++){
 			this.btns[i].destroy();
-			this.domElement.removeChild(this.btns[i].domElement);
-			this.btns[i].domElement = null;
+			// this.domElement.removeChild(this.btns[i].domElement);
+			// this.btns[i].domElement = null;
 		}
 		this.container.removeChild(this.domElement);
 		this.trigger("pagination.destroy");
